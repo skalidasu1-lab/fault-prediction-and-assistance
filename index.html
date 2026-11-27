@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vehicle Fault Dashboard</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+  <h1>Vehicle Health Dashboard</h1>
+  <div class="controls">
+    <select id="mode">
+      <option value="mock">Simulator (fake Arduino)</option>
+      <option value="serial">Real Arduino (USB)</option>
+    </select>
+    <button id="connectBtn">Connect</button>
+    <span id="status">Disconnected</span>
+  </div>
+</header>
+<main>
+  <div id="banner" class="banner ok">All systems normal</div>
+  <section class="cards">
+    <div class="card" id="tempCard"><h2>Engine temperature</h2>
+      <div class="big"><span id="temp">--</span> &deg;C</div>
+      <button id="scanT" disabled>Scan temperature</button></div>
+    <div class="card" id="battCard"><h2>Battery voltage</h2>
+      <div class="big"><span id="batt">--</span> V</div>
+      <button id="scanB" disabled>Scan battery</button></div>
+  </section>
+  <p id="scanStatus"></p>
+  <section id="mockPanel" class="panel"><h3>Simulator controls</h3>
+    <label><input type="checkbox" data-fault="hot"> Overheat</label>
+    <label><input type="checkbox" data-fault="low"> Low battery</label>
+    <label><input type="checkbox" data-fault="unplugged"> Sensor unplugged</label>
+  </section>
+  <section class="panel"><h3>Alerts</h3><ul id="alertLog"></ul></section>
+  <section class="panel"><h3>Recent readings</h3>
+    <table><thead><tr><th>Time</th><th>Type</th><th>Temp &deg;C</th><th>Battery V</th></tr></thead><tbody id="rows"></tbody></table>
+    <p><button id="exportBtn">Export CSV</button> <button id="clearBtn">Clear history</button></p>
+  </section>
+  <section class="panel"><h3>Raw serial log</h3><pre id="log"></pre></section>
+</main>
+<script src="js/config.js"></script>
+<script src="js/parser.js"></script>
+<script src="js/alerts.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/fakeArduino.js"></script>
+<script src="js/serialArduino.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
