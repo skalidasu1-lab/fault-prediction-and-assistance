@@ -3,53 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vehicle Health &amp; Fault Telemetry</title>
+<title>Vehicle Health Monitor</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<div class="app-shell">
-  <aside id="sidebar" class="sidebar" aria-label="Dashboard navigation">
-    <div class="brand">
-      <span class="brand-dot" aria-hidden="true"></span>
-      <div>
-        <div class="brand-title">FaultSense ECU</div>
-        <div class="brand-sub">Telemetry &amp; Diagnostics</div>
-      </div>
-      <button id="sidebarToggle" class="icon-btn" type="button" title="Toggle sidebar" aria-label="Toggle sidebar">&#9776;</button>
+<div class="shell">
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-top">
+      <div class="sys-name">ECU BENCH // 01</div>
+      <button id="sidebarToggle" class="btn-icon" type="button" title="Toggle sidebar" aria-label="Toggle sidebar">&#9776;</button>
     </div>
 
-    <nav class="nav-list">
-      <a class="nav-item active" href="#telemetry-overview">Live Telemetry</a>
-      <a class="nav-item" href="#sim-section">Fault Simulator</a>
-      <a class="nav-item" href="#ai-assistance">Diagnostic Assistant</a>
-      <a class="nav-item" href="#history-section">Readings &amp; Logs</a>
+    <nav class="nav">
+      <a href="#telemetry-overview" class="active">Telemetry</a>
+      <a href="#sim-section">Simulator</a>
+      <a href="#ai-assistance">Diagnostics</a>
+      <a href="#history-section">History &amp; Serial</a>
     </nav>
 
-    <div class="sidebar-meta">
-      <div class="meta-row"><span>Temp Limit</span><strong class="mono" id="cfgTempMax">-- &deg;C</strong></div>
-      <div class="meta-row"><span>Batt Window</span><strong class="mono" id="cfgBattWin">-- V</strong></div>
-      <div class="meta-row"><span>Serial Baud</span><strong class="mono" id="cfgBaud">--</strong></div>
-    </div>
+    <dl class="spec-list mono">
+      <div><dt>TEMP LIMIT</dt><dd id="cfgTempMax">-- &deg;C</dd></div>
+      <div><dt>BATT RANGE</dt><dd id="cfgBattWin">-- V</dd></div>
+      <div><dt>BAUD RATE</dt><dd id="cfgBaud">--</dd></div>
+    </dl>
   </aside>
 
-  <div class="main-wrap">
+  <div class="workspace">
     <header class="topbar">
-      <div class="topbar-left">
-        <button id="mobileNavBtn" class="icon-btn mobile-only" type="button" aria-label="Open menu">&#9776;</button>
-        <div>
-          <h1>Vehicle Health Dashboard</h1>
-          <p class="subtitle">Real-time thermal &amp; electrical fault monitoring</p>
-        </div>
+      <div class="title-group">
+        <button id="mobileNavBtn" class="btn-icon mobile-only" type="button" aria-label="Toggle menu">&#9776;</button>
+        <h1>Vehicle Health Monitor</h1>
       </div>
 
-      <div class="controls">
-        <div class="health-pill" id="healthPill" title="Current ECU connection &amp; fault state">
-          <span class="health-dot ok" id="healthDot"></span>
-          <span id="status">Disconnected</span>
-        </div>
+      <div class="conn-bar">
+        <span id="status" class="status-tag mono">Disconnected</span>
         <select id="mode" aria-label="Connection mode">
           <option value="mock">Simulator (fake Arduino)</option>
           <option value="serial">Real Arduino (USB)</option>
@@ -61,143 +51,131 @@
     <main id="telemetry-overview">
       <div id="banner" class="banner ok" role="status">All systems normal</div>
 
-      <section class="bento-grid">
-        <article class="card metric-card" id="tempCard">
-          <div class="card-head">
-            <div>
-              <h2>Engine Temperature</h2>
-              <span class="hint" title="Alerts if above CONFIG.TEMP_MAX or ERR,TEMP is received">Coolant / block thermal channel</span>
-            </div>
-            <span class="badge ok" id="tempBadge">NOMINAL</span>
+      <section class="grid-main">
+        <article class="panel metric" id="tempCard">
+          <div class="panel-header">
+            <span class="label">ENGINE TEMP</span>
+            <button id="scanT" class="btn" type="button" disabled>Scan T</button>
           </div>
-          <div class="metric-value-row">
-            <div class="big mono"><span id="temp">--</span><span class="unit">&deg;C</span></div>
-            <button id="scanT" class="btn btn-secondary" type="button" disabled>Scan temperature</button>
+          <div class="reading mono"><span id="temp">--</span><span class="unit">&deg;C</span></div>
+          <div class="meter">
+            <div class="meter-fill" id="tempBar"></div>
           </div>
-          <div class="gauge-wrap">
-            <div class="gauge-track">
-              <div class="gauge-fill" id="tempBar"></div>
-            </div>
-            <div class="gauge-scale mono"><span>0&deg;C</span><span id="tempMaxLabel">Max -- &deg;C</span></div>
+          <div class="meter-foot mono">
+            <span>0&deg;C</span>
+            <span id="tempMaxLabel">LIMIT -- &deg;C</span>
           </div>
         </article>
 
-        <article class="card metric-card" id="battCard">
-          <div class="card-head">
-            <div>
-              <h2>Battery Voltage</h2>
-              <span class="hint" title="Alerts outside CONFIG.BATT_MIN and CONFIG.BATT_MAX">12V bus &amp; charging monitor</span>
-            </div>
-            <span class="badge ok" id="battBadge">NOMINAL</span>
+        <article class="panel metric" id="battCard">
+          <div class="panel-header">
+            <span class="label">BATTERY BUS</span>
+            <button id="scanB" class="btn" type="button" disabled>Scan B</button>
           </div>
-          <div class="metric-value-row">
-            <div class="big mono"><span id="batt">--</span><span class="unit">V</span></div>
-            <button id="scanB" class="btn btn-secondary" type="button" disabled>Scan battery</button>
+          <div class="reading mono"><span id="batt">--</span><span class="unit">V</span></div>
+          <div class="meter">
+            <div class="meter-fill" id="battBar"></div>
           </div>
-          <div class="gauge-wrap">
-            <div class="gauge-track">
-              <div class="gauge-fill" id="battBar"></div>
-            </div>
-            <div class="gauge-scale mono"><span id="battMinLabel">-- V</span><span id="battMaxLabel">-- V</span></div>
+          <div class="meter-foot mono">
+            <span id="battMinLabel">-- V</span>
+            <span id="battMaxLabel">-- V</span>
           </div>
         </article>
 
-        <article class="card chart-card">
-          <div class="card-head">
-            <div>
-              <h2>Live Sensor Trend</h2>
-              <span class="hint">Recent stored readings (&deg;C &amp; V)</span>
-            </div>
-            <div class="legend mono">
-              <span><i class="dot temp-dot"></i>Temp (&deg;C)</span>
-              <span><i class="dot batt-dot"></i>Batt (V)</span>
+        <article class="panel chart-panel">
+          <div class="panel-header">
+            <span class="label">SIGNAL TREND (LAST 30)</span>
+            <div class="series-key mono">
+              <span class="k-temp">TEMP &deg;C</span>
+              <span class="k-batt">BATT V</span>
             </div>
           </div>
-          <div class="chart-box">
-            <svg id="trendChart" viewBox="0 0 640 190" preserveAspectRatio="none" aria-label="Sensor trend chart">
-              <line x1="0" y1="45" x2="640" y2="45" class="grid-line"></line>
-              <line x1="0" y1="95" x2="640" y2="95" class="grid-line"></line>
-              <line x1="0" y1="145" x2="640" y2="145" class="grid-line"></line>
-              <path id="battPath" class="series-batt" fill="none" d=""></path>
-              <path id="tempPath" class="series-temp" fill="none" d=""></path>
+          <div class="chart-stage">
+            <svg id="trendChart" viewBox="0 0 640 150" preserveAspectRatio="none" aria-label="Signal trend chart">
+              <line x1="0" y1="30" x2="640" y2="30" class="grid"></line>
+              <line x1="0" y1="75" x2="640" y2="75" class="grid"></line>
+              <line x1="0" y1="120" x2="640" y2="120" class="grid"></line>
+              <path id="battPath" class="line-batt" fill="none" d=""></path>
+              <path id="tempPath" class="line-temp" fill="none" d=""></path>
             </svg>
-            <div id="chartEmpty" class="empty-state">No readings recorded yet. Connect to start streaming telemetry.</div>
+            <div id="chartEmpty" class="chart-empty mono">NO STREAM DATA</div>
           </div>
-          <p id="scanStatus" class="scan-status mono" aria-live="polite"></p>
+          <p id="scanStatus" class="scan-line mono" aria-live="polite"></p>
         </article>
       </section>
 
-      <section id="sim-section" class="panel">
-        <div class="panel-head">
-          <div>
-            <h3>Simulator Controls</h3>
-            <p class="panel-sub">Inject faults or apply quick test profiles in Simulator mode</p>
-          </div>
-          <div class="preset-group">
-            <button type="button" class="btn btn-ghost" data-preset="normal">Normal Baseline</button>
-            <button type="button" class="btn btn-ghost" data-preset="overheat">Simulate Overheat</button>
-            <button type="button" class="btn btn-ghost" data-preset="lowbatt">Simulate Low Battery</button>
-            <button type="button" class="btn btn-ghost" data-preset="unplugged">Simulate Unplugged</button>
+      <section id="sim-section" class="panel block">
+        <div class="panel-header">
+          <span class="label">SIMULATOR FAULTS &amp; PRESETS</span>
+          <div class="presets">
+            <button type="button" class="btn btn-sm" data-preset="normal">Normal</button>
+            <button type="button" class="btn btn-sm" data-preset="overheat">Overheat</button>
+            <button type="button" class="btn btn-sm" data-preset="lowbatt">Low Batt</button>
+            <button type="button" class="btn btn-sm" data-preset="unplugged">Unplugged</button>
           </div>
         </div>
-        <div id="mockPanel" class="fault-switches">
-          <label class="switch-card"><input type="checkbox" data-fault="hot"><span>Overheat</span></label>
-          <label class="switch-card"><input type="checkbox" data-fault="low"><span>Low battery</span></label>
-          <label class="switch-card"><input type="checkbox" data-fault="unplugged"><span>Sensor unplugged</span></label>
+        <div id="mockPanel" class="checks">
+          <label class="check"><input type="checkbox" data-fault="hot"><span>Overheat</span></label>
+          <label class="check"><input type="checkbox" data-fault="low"><span>Low battery</span></label>
+          <label class="check"><input type="checkbox" data-fault="unplugged"><span>Sensor unplugged</span></label>
         </div>
       </section>
 
-      <section id="ai-assistance" class="panel assistant-panel">
-        <div class="panel-head">
-          <div>
-            <h3>Diagnostic Assistant</h3>
-            <p class="panel-sub">Guided root-cause checks and field steps based on current alerts</p>
+      <section class="grid-mid">
+        <article id="ai-assistance" class="panel block">
+          <div class="panel-header">
+            <span class="label">FAULT ASSISTANCE</span>
+            <button id="copyReportBtn" class="btn btn-sm" type="button">Copy Report</button>
           </div>
-          <button id="copyReportBtn" class="btn btn-secondary" type="button">Copy Diagnostic Report</button>
-        </div>
-        <div id="assistantBody" class="assistant-body"></div>
+          <div id="assistantBody" class="diag-list"></div>
+        </article>
+
+        <article class="panel block">
+          <div class="panel-header">
+            <span class="label">ALERT LOG</span>
+            <span id="alertCount" class="mono muted">0 ACTIVE</span>
+          </div>
+          <ul id="alertLog" class="alerts"></ul>
+        </article>
       </section>
 
-      <section class="panel">
-        <div class="panel-head">
-          <h3>Active Alerts</h3>
-          <span class="hint" id="alertCount">0 active</span>
-        </div>
-        <ul id="alertLog" class="alert-list"></ul>
-      </section>
-
-      <section id="history-section" class="split-panels">
-        <div class="panel">
-          <div class="panel-head">
-            <h3>Recent Readings</h3>
-            <div class="btn-row">
-              <button id="exportBtn" class="btn btn-secondary" type="button">Export CSV</button>
-              <button id="clearBtn" class="btn btn-danger-outline" type="button">Clear history</button>
+      <section id="history-section" class="grid-bottom">
+        <article class="panel block">
+          <div class="panel-header">
+            <span class="label">RECENT READINGS</span>
+            <div class="actions">
+              <button id="exportBtn" class="btn btn-sm" type="button">Export CSV</button>
+              <button id="clearBtn" class="btn btn-sm btn-danger" type="button">Clear</button>
             </div>
           </div>
-          <div class="table-wrap">
+          <div class="table-scroll">
             <table>
               <thead>
-                <tr><th>Time</th><th>Type</th><th>Temp &deg;C</th><th>Battery V</th></tr>
+                <tr>
+                  <th>Time</th>
+                  <th>Src</th>
+                  <th>Temp &deg;C</th>
+                  <th>Batt V</th>
+                </tr>
               </thead>
               <tbody id="rows"></tbody>
             </table>
           </div>
-        </div>
+        </article>
 
-        <div class="panel">
-          <div class="panel-head">
-            <h3>Raw Serial Log</h3>
-            <span class="hint mono">ECU Stream</span>
+        <article class="panel block">
+          <div class="panel-header">
+            <span class="label">SERIAL STREAM</span>
+            <span class="mono muted">RX / TX</span>
           </div>
           <pre id="log" class="mono"></pre>
-        </div>
+        </article>
       </section>
     </main>
   </div>
 </div>
 
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="toast" class="toast mono" role="status" aria-live="polite"></div>
 
 <script src="js/config.js"></script>
 <script src="js/parser.js"></script>
